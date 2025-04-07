@@ -1,0 +1,391 @@
+/* App.css */
+/* Сбросы */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: #f2f2f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Основной контейнер */
+.container {
+  position: relative;
+  width: 950px;
+  min-height: 560px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: 0.6s ease-in-out;
+}
+
+/* Переключение панелей для десктопа */
+.container.right-panel-active .sign-in-container {
+  transform: translateX(100%);
+  opacity: 0;
+  z-index: 1;
+}
+.container.right-panel-active .sign-up-container {
+  transform: translateX(0);
+  opacity: 1;
+  z-index: 5;
+}
+
+/* Левая панель (Вход) */
+.sign-in-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  padding: 60px 40px;
+  transition: 0.6s ease-in-out;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform: translateX(0);
+}
+.sign-in-container form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+.sign-in-container input {
+  background: #f6f6f6;
+  color: #000;
+}
+.sign-up-container input {
+  background: #f6f6f6;
+  color: #000;
+}
+
+/* Правая панель (Регистрация) */
+.sign-up-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  padding: 60px 40px;
+  transition: 0.6s ease-in-out;
+  opacity: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform: translateX(100%);
+}
+.sign-up-container form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Оверлей-контейнер (для десктопа) */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 100;
+  transition: transform 0.6s ease-in-out;
+}
+.container.right-panel-active .overlay-container {
+  transform: translateX(-100%);
+}
+.overlay {
+  background: #000;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: 0.6s ease-in-out;
+}
+.container.right-panel-active .overlay {
+  transform: translateX(50%);
+}
+.overlay-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  color: #ffd700;
+  transition: 0.6s ease-in-out;
+  padding: 0 40px;
+}
+.overlay-panel h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.overlay-panel p {
+  font-size: 14px;
+  max-width: 300px;
+  margin: 20px 0 30px;
+  line-height: 1.4em;
+}
+.overlay-left {
+  transform: translateX(-20%);
+}
+.container.right-panel-active .overlay-left {
+  transform: translateX(0);
+}
+.overlay-right {
+  right: 0;
+  transform: translateX(0);
+}
+.container.right-panel-active .overlay-right {
+  transform: translateX(20%);
+}
+
+/* Общие стили для форм */
+form .title {
+  font-size: 1.6rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+form span {
+  font-size: 14px;
+  color: #666;
+  margin: 10px 0 16px;
+  display: block;
+}
+form input {
+  border: none;
+  border-radius: 5px;
+  padding: 12px 15px;
+  margin: 8px 0;
+  font-size: 14px;
+  outline: none;
+}
+form input:focus {
+  outline: 2px solid #ffd700;
+}
+form .forgot {
+  color: #666;
+  font-size: 12px;
+  margin: 5px 0 15px;
+  text-decoration: none;
+  cursor: pointer;
+}
+form .forgot:hover {
+  text-decoration: underline;
+}
+
+/* Кнопки */
+.btn {
+  border: 1px solid #ffd700;
+  background: #ffd700;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 20px;
+  padding: 12px 45px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+.btn:hover {
+  background: #e6c200;
+}
+.ghost {
+  background: transparent;
+  border-color: #ffd700;
+  color: #ffd700;
+}
+.ghost:hover {
+  background: rgba(255, 215, 0, 0.1);
+}
+.alert-message {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid #ffd700;
+  color: #000;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Полупрозрачный фон (оверлей) для "Забыли пароль?" */
+.forgot-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+  z-index: 1000;
+}
+.forgot-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.forgot-password-panel {
+  background: #f6f6f6;
+  color: #000;
+}
+.forgot-password-panel input{
+  background: #f6f6f6;
+  color: #000;
+}
+
+/* Модальное окно "Восстановление пароля" */
+.forgot-password-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  max-width: 90%;
+  background: #fff;
+  padding: 30px 20px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  z-index: 1300;
+}
+.forgot-password-panel.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* Внутренние элементы формы восстановления */
+.forgot-password-panel h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.input-group label {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+.input-group input {
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.code-group {
+  display: flex;
+  align-items: center;
+}
+.code-group input {
+  flex: 1;
+  margin-right: 10px;
+}
+.btn.code-btn {
+  min-width: 120px;
+}
+.btn.restore-btn {
+  margin-top: 20px;
+  width: 100%;
+}
+.btn.back-btn {
+  margin-top: 10px;
+  background: transparent;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  width: auto;
+}
+
+/* Мобильный переключатель форм */
+.mobile-toggle {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 150;
+}
+.mobile-toggle .toggle-btn {
+  background: #ffd700;
+  border: none;
+  color: #000;
+  padding: 8px 15px;
+  margin-right: 5px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.mobile-toggle .toggle-btn.active,
+.mobile-toggle .toggle-btn:hover {
+  background: #e6c200;
+}
+
+/* Адаптивные стили для устройств 360×760px */
+@media (max-width: 480px) {
+  .container {
+    width: 360px;
+    height: 760px;
+    min-height: auto;
+    border-radius: 10px;
+  }
+  .form-container {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px 10px;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .sign-in-container, .sign-up-container {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+  }
+  .container:not(.right-panel-active) .sign-in-container {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .container.right-panel-active .sign-up-container {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .overlay-container {
+    display: none;
+  }
+  .mobile-toggle {
+    display: block;
+  }
+  .forgot-password-panel {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+  }
+}
