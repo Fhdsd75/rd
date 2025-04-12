@@ -18,7 +18,7 @@ body {
 .container {
   position: relative;
   width: 950px;
-  min-height: 560px;
+  min-height: 660px;
   border-radius: 10px;
   overflow: hidden;
   background: #fff;

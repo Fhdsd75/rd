@@ -1,3 +1,4 @@
+/* ========== БАЗОВЫЕ СТИЛИ ========== */
 * {
   margin: 0;
   padding: 0;
@@ -5,177 +6,662 @@
   font-family: Arial, sans-serif;
 }
 
-/* Шапка */
+/* ---------- Шапка ---------- */
 .header {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(1.5px);
-  height: 143px;
+  background: #131313;
+  height: 110px; /* Сделаем хедер выше, чтобы лого не выглядело сжатым */
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
   z-index: 1280;
 }
 
-/* Контейнер для центрирования */
 .header-content {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
   max-width: 1600px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* ========== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (KZ/RU) ========== */
-.language-toggle {
-  position: relative;
-  width: 74px;
-  height: 39px;
-  border-radius: 20px;
+/* В центральном блоке используем gap для равномерного расстояния между элементами */
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* расстояние между кнопками и логотипом */
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* ---------- Бургер‑меню ---------- */
+.burger-menu {
   cursor: pointer;
-  background: linear-gradient(to right, #C0C0C0, #504F4E);
+  z-index: 1300;
+}
+.burger-bar {
+  width: 30px;
+  height: 4px;
+  background: #D4B662;
+  margin: 4px 0;
+  border-radius: 2px;
 }
 
-.language-toggle .toggle-circle {
-  width: 35px;
-  height: 35px;
-  background-color: #D4B662;
-  border-radius: 50%;
+/* ---------- Навигационные кнопки в шапке ---------- */
+.nav-button {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: #D4B662;
+  border: none;
+  padding: 8px 16px;
+  font-size: 25px;
+  cursor: pointer;
+  transition: border-bottom 0.6s ease, text-shadow 0.6s ease;
+}
+.nav-button.active {
+  border-bottom: 2px solid #D4B662;
+  text-shadow: 0 2px 4px rgba(212, 182, 98, 0.6);
+}
+
+/* Логотип: по умолчанию должен быть подсвечен (активен) */
+.logo {
+  cursor: pointer;
+}
+.logo.active {
+  border-bottom: 2px solid #D4B662;
+}
+.logo img {
+  height: 90px; /* Увеличиваем логотип в соответствии с высотой хедера */
+  width: auto;  /* Сохраняем пропорции */
+}
+
+/* ============ Переключатель языка (уменьшенный в 1.5 раза) ============ */
+.language-toggle2 {
+  position: relative;
+  width: 80px;
+  height: 32px;
+  border-radius: 16px;
+  background: linear-gradient(to right, #bfc1c2, #4d4e4f);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.language-toggle2 .lang-kz,
+.language-toggle2 .lang-ru {
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 0;
+  width: 40px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  font-weight: 700;
+  color: #000;
+  z-index: 3;
+}
+.language-toggle2 .lang-kz {
+  left: 0;
+}
+.language-toggle2 .lang-ru {
+  right: 0;
+}
+
+.language-toggle2 .toggle-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 32px;
+  border-radius: 16px;
+  background: #D4B662;
+  z-index: 1;
   transition: transform 0.3s ease;
 }
 
-.language-toggle.lang-dark .toggle-circle {
-  transform: translateX(37px);
+.language-toggle2.kz-active .toggle-circle {
+  transform: translateX(0);
+}
+.language-toggle2.ru-active .toggle-circle {
+  transform: translateX(40px);
 }
 
-.language-text {
-  position: absolute;
+/* ---------- Оверлей ---------- */
+.sidebar-overlay {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1350;
+  transition: opacity 0.4s ease;
+}
 
+/* ---------- Сайд‑бар ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
+.sidebar {
+  font-family: 'Merriweather', serif;
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100%;
+  background: #131313;
+  color: #D4B662;
+  z-index: 1400;
+  transition: transform 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.sidebar.open {
+  transform: translateX(300px);
+}
+
+/* ---------- Вершина сайд‑бара ---------- */
+.sidebar-header.user-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-  z-index: 2;
+  gap: 12px;
+  margin-bottom: 20px;
 }
-
-/* ---------- КНОПКИ (NAV-BUTTON) ---------- */
-.nav-button {
-  background-color: #D4B662;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 16px;
-  color: #282726;
-  transition: background-color 0.3s;
-  height: 39px;
-  width: 173px;
-}
-
-.nav-button:hover {
-  background-color: #b8972e;
-}
-
-/* Отступы между элементами */
-/* (1) язык → (2) Главное (30px) */
-.main-button {
-  margin-left: 30px;
-}
-
-/* (3) Контакты (43px от "Главное") */
-.contact-button {
-  margin-left: 43px;
-}
-
-/* (4) Логотип (67px от "Контакты") */
-.logo {
-  margin-left: 67px;
-}
-
-.logo img {
-  height: 150px;
-  width: 134.2px;
-}
-
-/* (5) О нас (67px от логотипа) */
-.about-button {
-  margin-left: 67px;
-}
-
-/* (6) Профиль (43px от "О нас") */
-.profile-button {
-  margin-left: 43px;
-}
-
-/* (7) Переключатель темы (26px от "Профиль") */
-.theme-toggle {
-  margin-left: 26px;
-  width: 74px;
-  height: 39px;
-  background: linear-gradient(to right, #C0C0C0, #504F4E);
-  border-radius: 20px;
-  position: relative;
-  cursor: pointer;
-}
-
-.toggle-icon {
-  width: 24px;
-  height: 24px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.left-icon {
-  left: 5px;
-}
-
-.right-icon {
-  right: 5px;
-}
-
-.theme-toggle .toggle-circle {
-  width: 35px;
-  height: 35px;
-  background-color: #D4B662;
+.user-avatar .avatar-circle {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.3s ease;
+  background: #fff;
+  color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-name-edit {
+  display: flex;
+  flex-direction: column;
+}
+.display-username {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.edit-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.edit-username {
+  border: none;
+  border-radius: 4px;
+  background: #2A2A2A;
+  color: #D4B662;
+  font-size: 16px;
+  padding: 4px 8px;
+  width: 120px;
 }
 
-.toggle-circle.dark {
-  transform: translateX(37px);
+/* ---------- ОБЩАЯ ДЛИНА КНОПОК ---------- */
+.sidebar-btn {
+  width: 90%;
 }
 
-.circle-icon {
+/* ---------- ИНДИВИДУАЛЬНЫЕ КНОПКИ САЙД‑БАРА ---------- */
+/* Статистика */
+.sidebar-btn-statistics {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-statistics::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-statistics:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-statistics:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-statistics {
   width: 24px;
   height: 24px;
+  object-fit: contain;
+}
+
+/* Профиль */
+.sidebar-btn-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-profile::before {
+  content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
-  opacity: 0;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-profile:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-profile:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-profile {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
-.circle-icon.fade-in {
-  opacity: 1;
+/* Тесты */
+.sidebar-btn-tests {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-tests::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-tests:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-tests:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-tests {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
-.circle-icon.fade-out {
-  opacity: 0;
+/* Подписки */
+.sidebar-btn-sub {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 10px 0 30px;
+  gap: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-sub::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-sub:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-sub:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-sub {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+/* Переключатель темы */
+.sidebar-btn-theme {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-theme::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-theme:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-theme:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-theme {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* О нас */
+.sidebar-btn-about {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-about::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-about:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-about:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-about {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Информация */
+.sidebar-btn-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-info::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-info:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-info:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-info {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Помощь */
+.sidebar-btn-help {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 52px;
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #e0e0e0;
+  font-size: 16px;
+  border: none;
+  padding: 0 20px 0 34px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  margin-bottom: 5px;
+}
+.sidebar-btn-help::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #fff;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition: background 0.3s ease;
+}
+.sidebar-btn-help:hover::before {
+  background: #D4B662;
+}
+.sidebar-btn-help:active {
+  transform: scale(1.05);
+}
+.sidebar-icon-help {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* ---------- Разделитель и футер ---------- */
+.sidebar-divider {
+  height: 1px;
+  background: #444;
+  border: none;
+  margin: 16px 0;
+}
+.sidebar-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+.exit-btn {
+  background: #D4B45B;
+  color: #e0e0e0;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.exit-btn:hover {
+  background: #b8972e;
+}
+
+/* ---------- Стили для фото (иконки и аватар) ---------- */
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sidebar-icon-statistics,
+.sidebar-icon-profile,
+.sidebar-icon-tests,
+.sidebar-icon-theme,
+.sidebar-icon-about,
+.sidebar-icon-info,
+.sidebar-icon-help {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* ---------- ТЕМЫ ---------- */
+/* Тёмный режим */
+body.dark-mode .header {
+  background: #131313;
+}
+body.dark-mode .sidebar {
+  background: #131313;
+  color: #e0e0e0;
+}
+
+body.light-mode .header {
+  background: #FFFFFF;
+}
+body.light-mode .sidebar {
+  background: #FFFFFF;
+  color: #000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+}
+body.light-mode .sidebar .sidebar-btn-statistics,
+body.light-mode .sidebar .sidebar-btn-profile,
+body.light-mode .sidebar .sidebar-btn-tests,
+body.light-mode .sidebar .sidebar-btn-sub,
+body.light-mode .sidebar .sidebar-btn-theme,
+body.light-mode .sidebar .sidebar-btn-about,
+body.light-mode .sidebar .sidebar-btn-info,
+body.light-mode .sidebar .sidebar-btn-help {
+  background: linear-gradient(to right, #D5B45B, transparent);
+  color: #000;
+}
+body.light-mode .sidebar .sidebar-btn-statistics::before,
+body.light-mode .sidebar .sidebar-btn-profile::before,
+body.light-mode .sidebar .sidebar-btn-tests::before,
+body.light-mode .sidebar .sidebar-btn-sub::before,
+body.light-mode .sidebar .sidebar-btn-theme::before,
+body.light-mode .sidebar .sidebar-btn-about::before,
+body.light-mode .sidebar .sidebar-btn-info::before,
+body.light-mode .sidebar .sidebar-btn-help::before {
+  background: #000;
+}
+/* Кнопки в нижнем правом углу (50px отступ) */
+.floating-links {
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 9999; /* всегда поверх */
+}
+
+.floating-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #D4B662;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Иконки внутри кнопок */
+.floating-button img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }

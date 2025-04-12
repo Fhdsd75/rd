@@ -1,10 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // <-- Чтобы перейти к Header.jsx ("/")
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./logauth.css";
-import { REGISTER_URL } from "./cfg";
-import { login, getMe } from "./auth";
 
-/* ====== Форма входа (левая панель) ====== */
+
+import { REGISTER_URL } from "./cfg";
+import { login } from "./auth";
+
+// Валидация ИИН
+function validateIIN(iin) {
+  if (!/^\d{12}$/.test(iin)) {
+    return "ИИН должен состоять ровно из 12 цифр.";
+  }
+  const dayPart = parseInt(iin.substring(0, 2), 10);
+  if (dayPart < 1 || dayPart > 31) {
+    return "Первые две цифры ИИН должны быть в диапазоне 01–31.";
+  }
+  const monthPart = parseInt(iin.substring(2, 4), 10);
+  if (monthPart < 1 || monthPart > 12) {
+    return "3-я и 4-я цифры ИИН должны быть в диапазоне 01–12.";
+  }
+  return null;
+}
+
+// Валидация ФИО
+const bannedWords = ["гитлер", "сука", "блять"];
+function validateFIO(fio) {
+  const lower = fio.toLowerCase();
+  for (const w of bannedWords) {
+    if (lower.includes(w)) {
+      return `Недопустимое слово в ФИО: “${w}”`;
+    }
+  }
+  return null;
+}
+
+// Компонент формы входа
 function SignInForm({ onForgotPasswordClick }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -19,24 +49,21 @@ function SignInForm({ onForgotPasswordClick }) {
     const sanitizedUsername = sanitizeInput(username);
     const sanitizedPassword = sanitizeInput(password);
 
-    // Если нет '@', проверяем, что это минимум 12 цифр (ИИН)
     if (
       !sanitizedUsername.includes("@") &&
-      !/^\d{12,}$/.test(sanitizedUsername)
+      !/^\d{12}$/.test(sanitizedUsername)
     ) {
-      setMessage("Введите корректный Email или ИИН (минимум 12 цифр).");
+      setMessage("Введите корректный Email или ИИН (12 цифр).");
       return;
     }
-
     try {
       const result = await login({
         username: sanitizedUsername,
         password: sanitizedPassword,
       });
-      setMessage("Успешный вход! Токены получены.");
+      setMessage("Успешный вход!");
       console.log("Access Token:", result.access_token);
       console.log("Refresh Token:", result.refresh_token);
-      // Можно вызвать getMe() при необходимости
     } catch (err) {
       setMessage(err.message || "Ошибка соединения с сервером");
     }
@@ -44,9 +71,8 @@ function SignInForm({ onForgotPasswordClick }) {
 
   return (
     <form onSubmit={handleLoginSubmit}>
-      <h2 className="title">Вход в RD</h2>
+      <h2 className="title">Вход</h2>
       {message && <div className="alert-message">{message}</div>}
-      <span>или используйте ваш Email / ИИН:</span>
       <input
         type="text"
         placeholder="Email или ИИН"
@@ -62,9 +88,14 @@ function SignInForm({ onForgotPasswordClick }) {
         required
         minLength={6}
       />
-      <a href="#!" className="forgot" onClick={onForgotPasswordClick}>
+      {/* Обновленная кнопка "Забыли пароль?" */}
+      <button
+        type="button"
+        className="forgot"
+        onClick={onForgotPasswordClick}
+      >
         Забыли пароль?
-      </a>
+      </button>
       <button type="submit" className="btn">
         Войти
       </button>
@@ -72,9 +103,10 @@ function SignInForm({ onForgotPasswordClick }) {
   );
 }
 
-/* ====== Форма регистрации (правая панель) ====== */
+// Компонент формы регистрации
 function SignUpForm() {
   const [iin, setIin] = useState("");
+  const [fio, setFio] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -83,45 +115,34 @@ function SignUpForm() {
 
   const sanitizeInput = (input) =>
     input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-  const validateIIN = (value) => {
-    if (value.includes("@")) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(value);
-    } else {
-      const digitsRegex = /^\d{12,}$/;
-      return digitsRegex.test(value);
-    }
-  };
-
-  const validatePhone = (phone) => {
-    const phoneRegex = /^\+7\d{10}$/;
-    return phoneRegex.test(phone);
-  };
+  const validatePhone = (phone) => /^\+7\d{10}$/.test(phone);
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
-    const sanitizedIin = sanitizeInput(iin);
-    const sanitizedPhone = sanitizeInput(phone);
-    const sanitizedEmail = sanitizeInput(email);
-    const sanitizedPassword = sanitizeInput(password);
-    const sanitizedConfirmPassword = sanitizeInput(confirmPassword);
+    const sIin = sanitizeInput(iin);
+    const sFio = sanitizeInput(fio);
+    const sPhone = sanitizeInput(phone);
+    const sEmail = sanitizeInput(email);
+    const sPassword = sanitizeInput(password);
+    const sConfirm = sanitizeInput(confirmPassword);
 
-    if (!validateIIN(sanitizedIin)) {
-      setMessage(
-        "Введите корректный ИИН (12 цифр) или email (с '@' и '.')"
-      );
+    const iinError = validateIIN(sIin);
+    if (iinError) {
+      setMessage(iinError);
       return;
     }
-    if (!validatePhone(sanitizedPhone)) {
-      setMessage(
-        "Введите корректный номер телефона: +7XXXXXXXXXX (10 цифр после +7)."
-      );
+    const fioError = validateFIO(sFio);
+    if (fioError) {
+      setMessage(fioError);
       return;
     }
-    if (sanitizedPassword !== sanitizedConfirmPassword) {
+    if (!validatePhone(sPhone)) {
+      setMessage("Номер телефона должен быть в формате +7XXXXXXXXXX.");
+      return;
+    }
+    if (sPassword !== sConfirm) {
       setMessage("Пароли не совпадают.");
       return;
     }
@@ -131,18 +152,19 @@ function SignUpForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          iin: sanitizedIin,
-          phone: sanitizedPhone,
-          email: sanitizedEmail,
-          password: sanitizedPassword,
-          confirm_password: sanitizedConfirmPassword,
+          iin: sIin,
+          fio: sFio,
+          phone: sPhone,
+          email: sEmail,
+          password: sPassword,
+          confirm_password: sConfirm,
         }),
       });
       const result = await response.json();
       if (!response.ok) {
         setMessage(result.detail || "Ошибка регистрации");
       } else {
-        setMessage("Успешная регистрация! Токены получены.");
+        setMessage("Регистрация успешна!");
         console.log("Access Token:", result.access_token);
         console.log("Refresh Token:", result.refresh_token);
       }
@@ -153,17 +175,22 @@ function SignUpForm() {
 
   return (
     <form onSubmit={handleRegisterSubmit}>
-      <h2 className="title">Создать аккаунт в RD</h2>
+      <h2 className="title">Регистрация</h2>
       {message && <div className="alert-message">{message}</div>}
-      <span>или используйте вашу почту / ИИН:</span>
       <input
         type="text"
         placeholder="ИИН (12 цифр)"
         value={iin}
         onChange={(e) => setIin(e.target.value)}
         required
-        minLength={12}
         maxLength={12}
+      />
+      <input
+        type="text"
+        placeholder="ФИО"
+        value={fio}
+        onChange={(e) => setFio(e.target.value)}
+        required
       />
       <input
         type="email"
@@ -174,7 +201,7 @@ function SignUpForm() {
       />
       <input
         type="tel"
-        placeholder="Телефон (+7XXXXXXXXXX)"
+        placeholder="+7XXXXXXXXXX"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         required
@@ -196,76 +223,65 @@ function SignUpForm() {
         minLength={6}
       />
       <button type="submit" className="btn">
-        Регистрация
+        Зарегистрироваться
       </button>
     </form>
   );
 }
 
-/* ====== Модальное окно "Забыли пароль?" ====== */
-function ForgotPassword({ onBack }) {
+// Компонент восстановления пароля
+function ForgotPassword({ onClose }) {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [countdown, setCountdown] = useState(0);
-  const [timerId, setTimerId] = useState(null);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validateEmail = (val) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
   const requestCode = () => {
     if (!validateEmail(email)) {
       setMessage("Введите корректный Email.");
       return;
     }
-    setMessage("");
+    setMessage("Код отправлен на ваш Email.");
     setCountdown(60);
-    const id = setInterval(() => {
+    const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          clearInterval(id);
+          clearInterval(interval);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-    setTimerId(id);
   };
 
   const handleRestore = () => {
     if (!/^\d{5}$/.test(code)) {
-      setMessage("Введите корректный 5-значный код.");
+      setMessage("Введите 5-значный код.");
       return;
     }
-    setMessage("Инструкция по восстановлению пароля отправлена на вашу почту.");
+    setMessage("Пароль восстановлен. Проверьте Email.");
   };
 
-  useEffect(() => {
-    return () => {
-      if (timerId) clearInterval(timerId);
-    };
-  }, [timerId]);
-
   return (
-    <>
-      <h2>Восстановление пароля</h2>
+    <div className="forgot-password-panel-inner">
+      <h2>Восстановить пароль</h2>
       {message && <div className="alert-message">{message}</div>}
       <div className="input-group">
-        <label>Email:</label>
         <input
           type="email"
-          placeholder="Введите Email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </div>
       <div className="input-group code-group">
-        <label>Код:</label>
         <input
           type="text"
-          placeholder="Введите 5-значный код"
+          placeholder="5-значный код"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           maxLength={5}
@@ -276,106 +292,115 @@ function ForgotPassword({ onBack }) {
           onClick={requestCode}
           disabled={countdown > 0}
         >
-          {countdown > 0 ? `${countdown} сек` : "Запросить код"}
+          {countdown > 0 ? `${countdown} сек` : "Получить код"}
         </button>
       </div>
       <button
         type="button"
         className="btn restore-btn"
         onClick={handleRestore}
-        disabled={!/^\d{5}$/.test(code)}
       >
         Восстановить
       </button>
-      <button type="button" className="btn back-btn" onClick={onBack}>
-        Назад
+      <button type="button" className="btn back-btn" onClick={onClose}>
+        Закрыть
       </button>
-    </>
+    </div>
   );
 }
 
+// Основной компонент
 function App() {
-  const [rightPanelActive, setRightPanelActive] = useState(false);
+  const [activeForm, setActiveForm] = useState("signin"); // "signin" или "signup"
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  // Переключение панелей (Вход / Регистрация)
-  const handleSignUpClick = () => {
-    setRightPanelActive(true);
-    setShowForgotPassword(false);
-  };
-
   const handleSignInClick = () => {
-    setRightPanelActive(false);
+    setActiveForm("signin");
     setShowForgotPassword(false);
   };
 
-  // Открыть окно восстановления
+  const handleSignUpClick = () => {
+    setActiveForm("signup");
+    setShowForgotPassword(false);
+  };
+
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
   };
 
-  // Закрыть окно восстановления
-  const handleBack = () => {
+  const handleCloseForgotPassword = () => {
     setShowForgotPassword(false);
   };
 
   return (
     <div
-      className={`container ${rightPanelActive ? "right-panel-active" : ""}`}
+      className={`container ${
+        activeForm === "signup" ? "right-panel-active" : ""
+      }`}
     >
-      {/* Левая панель (Вход) */}
-      <div className="form-container sign-in-container">
-        {/* Форма входа */}
+      {/* Переключатель форм для мобильных устройств */}
+      <div className="mobile-toggle">
+        <button
+          className={`toggle-btn ${activeForm === "signin" ? "active" : ""}`}
+          onClick={handleSignInClick}
+        >
+          Вход
+        </button>
+        <button
+          className={`toggle-btn ${activeForm === "signup" ? "active" : ""}`}
+          onClick={handleSignUpClick}
+        >
+          Регистрация
+        </button>
+      </div>
+
+      {/* Форма входа */}
+      <div
+        className={`form-container sign-in-container ${
+          activeForm === "signin" ? "active" : ""
+        }`}
+      >
         <SignInForm onForgotPasswordClick={handleForgotPasswordClick} />
-
-        {/* Кнопка "Назад" внизу слева (не ломает дизайн) */}
-        <Link to="/" className="back-bottom-left">
-          <button className="btn back-home-btn">Назад</button>
-        </Link>
       </div>
 
-      {/* Правая панель (Регистрация) */}
-      <div className="form-container sign-up-container">
-        {/* Форма регистрации */}
+      {/* Форма регистрации */}
+      <div
+        className={`form-container sign-up-container ${
+          activeForm === "signup" ? "active" : ""
+        }`}
+      >
         <SignUpForm />
-
-        {/* Кнопка "Назад" внизу слева (аналогично) */}
-        <Link to="/" className="back-bottom-left">
-          <button className="btn back-home-btn">Назад</button>
-        </Link>
       </div>
 
-      {/* Чёрный оверлей (для переключения панелей) */}
+      {/* Модальное окно восстановления пароля */}
+      <div
+        className={`forgot-overlay ${showForgotPassword ? "show" : ""}`}
+        onClick={handleCloseForgotPassword}
+      />
+      <div
+        className={`forgot-password-panel ${showForgotPassword ? "show" : ""}`}
+      >
+        <ForgotPassword onClose={handleCloseForgotPassword} />
+      </div>
+
+      {/* Оверлей для десктопа */}
       <div className="overlay-container">
         <div className="overlay">
           <div className="overlay-panel overlay-left">
-            <h1>Привет, друг!</h1>
-            <p>Введите свои личные данные и начните путешествие с нами</p>
+            <h1>Уже с нами?</h1>
+            <p>Войдите, чтобы продолжить</p>
             <button className="ghost btn" onClick={handleSignInClick}>
               Войти
             </button>
           </div>
           <div className="overlay-panel overlay-right">
-            <h1>Добро пожаловать назад!</h1>
-            <p>Чтобы оставаться с нами, войдите в свой аккаунт</p>
+            <h1>Новый пользователь?</h1>
+            <p>Создайте аккаунт прямо сейчас</p>
             <button className="ghost btn" onClick={handleSignUpClick}>
               Регистрация
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Модальное окно "Забыли пароль?" */}
-      <div
-        className={`forgot-overlay ${showForgotPassword ? "show" : ""}`}
-        onClick={handleBack}
-      ></div>
-      <div
-        className={`forgot-password-panel ${
-          showForgotPassword ? "show" : ""
-        }`}
-      >
-        <ForgotPassword onBack={handleBack} />
       </div>
     </div>
   );
